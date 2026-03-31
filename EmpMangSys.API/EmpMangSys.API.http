@@ -1,0 +1,6 @@
+@EmpMangSys.API_HostAddress = http://localhost:5237
+
+GET {{EmpMangSys.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
