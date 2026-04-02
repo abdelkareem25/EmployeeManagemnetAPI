@@ -1,37 +1,27 @@
-﻿using AutoMapper;
-using EmpMangSys.Api.DTOs.Employees;
-using EmpMangSys.Core.Data;
-using EmpMangSys.Core.Interface;
-using EmpMangSys.Repository.DataBaseContext;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
-namespace EmpMangSys.Api.Controllers
+﻿namespace EmpMangSys.Api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class EmployeeController : ControllerBase
+    public class EmployeeController : ApiBaseController
     {
         private readonly IMapper mapper;
-        private readonly IEmployeesRepository repository;
+        
+        private readonly IGenericRepository<Employee> employeeRepo;
 
-        public EmployeeController(IMapper mapper ,IEmployeesRepository repository)
+        public EmployeeController(IMapper mapper ,IGenericRepository<Employee> employeeRepo)
         {
             this.mapper = mapper;
-            this.repository = repository;
+            this.employeeRepo = employeeRepo;
         }
 
         //Get all
         [HttpGet]
-        public ActionResult<IEnumerable<GetEmployeesDTO>> GetAll()
+        public async Task<ActionResult<IEnumerable<GetEmployeesDTO>>> GetAll()
         {
             try
             {
-                var result = repository.GetAll();
+                var result = await employeeRepo.GetAllAsync();
                 if (result == null || !result.Any())
-                {
-                    return NotFound(new { message = "No employees found"});
-                }
+                     return NotFound(new { message = "No employees found"});
+                
                 var map= mapper.Map<IEnumerable<GetEmployeesDTO>>(result);
                 return Ok(map);
             }
@@ -47,11 +37,11 @@ namespace EmpMangSys.Api.Controllers
         }
         //Get by id
         [HttpGet("{id}")]
-        public ActionResult<GetEmployeesDTO> GetById(int id)
+        public async Task<ActionResult<GetEmployeesDTO>> GetById(int id)
         {
             try
             {
-                var result = repository.GetById(id);
+                var result = await employeeRepo.GetByIdAsync(id);
                 if (result == null)
                 {
                     return NotFound();
@@ -72,13 +62,13 @@ namespace EmpMangSys.Api.Controllers
         }
         //Create
         [HttpPost]
-        public ActionResult Create(CreateEmployeeDTO createEmployeeDto)
+        public async Task<ActionResult> Create(CreateEmployeeDTO createEmployeeDto)
         {
             try
             {
                 var employee = mapper.Map<Employee>(createEmployeeDto);
 
-                repository.Create(employee);
+                employeeRepo.CreateAsync(employee);
                 var result = mapper.Map<GetEmployeesDTO>(employee);
 
                 return CreatedAtAction(nameof(GetById), new { id = employee.Id }, result);
@@ -91,33 +81,33 @@ namespace EmpMangSys.Api.Controllers
         }
         //Update
         [HttpPut("{id}")]
-        public ActionResult Update(UpdateDTO dto ,int id)
+        public async Task<ActionResult> Update(UpdateDTO dto ,int id)
         {
-            var existingEmployee = repository.GetById(id); 
+            var existingEmployee = await employeeRepo.GetByIdAsync(id); 
             if (existingEmployee == null)
             {
                 return NotFound();
             }
             mapper.Map(dto, existingEmployee);
-            repository.Update(existingEmployee);
+            await employeeRepo.UpdateAsync(existingEmployee);
             return Ok(existingEmployee);
         }
         //Delete
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var employee = repository.GetById(id);
+            var employee = await employeeRepo.GetByIdAsync(id);
             if (employee == null)
                 return NotFound();
-            repository.Delete(id);
+            await employeeRepo.DeleteAsync(id);
             return NoContent();
         }
 
         // Search Endpoint
         [HttpGet("search")]
-        public ActionResult Search(string? name = null , string? department = null)
+        public async Task<ActionResult> Search(string? name = null , string? department = null)
         {
-            var result = repository.GetAll();
+            var result = await employeeRepo.GetAllAsync();
             if (!string.IsNullOrEmpty(name))
                 result = result.Where(e => e.FullName.Contains(name)).ToList();
             if(!string.IsNullOrEmpty(department))

@@ -1,0 +1,11 @@
+﻿global using AutoMapper;
+global using EmpMangSys.Api.DTOs.Employees;
+global using EmpMangSys.Core.Data;
+global using EmpMangSys.Core.Interface;
+global using Microsoft.AspNetCore.Mvc;
+global using EmpMangSys.Api.DTOs.Department;
+global using EmpMangSys.Api.Extensions;
+global using EmpMangSys.Api.Helper;
+global using EmpMangSys.Repository.DataBaseContext;
+global using EmpMangSys.Repository.Implementations;
+global using Microsoft.EntityFrameworkCore;

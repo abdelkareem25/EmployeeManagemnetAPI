@@ -1,11 +1,3 @@
-
-using EmpMangSys.Api.Extensions;
-using EmpMangSys.Api.Helper;
-using EmpMangSys.Core.Interface;
-using EmpMangSys.Repository.DataBaseContext;
-using EmpMangSys.Repository.Interface_Implementations;
-using Microsoft.EntityFrameworkCore;
-
 namespace EmpMangSys.API
 {
     public class Program
@@ -25,7 +17,7 @@ namespace EmpMangSys.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(MappingProfiles));
-            builder.Services.AddScoped<IEmployeesRepository, EmployeesRepository>();
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             #endregion
 
             var app = builder.Build();

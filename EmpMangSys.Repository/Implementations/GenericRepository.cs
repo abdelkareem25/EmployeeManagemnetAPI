@@ -15,12 +15,18 @@ namespace EmpMangSys.Repository.Implementations
         public async Task<T> CreateAsync(T entity)
         {
             await context.Set<T>().AddAsync(entity);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
+            return entity;
         }
 
-        public Task<T> DeleteAsync(int id)
+        public async Task<T> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var entity = await context.Set<T>().FindAsync(id);
+            if (entity == null)
+                 return null;
+            context.Set<T>().Remove(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -28,14 +34,16 @@ namespace EmpMangSys.Repository.Implementations
             return await context.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id)
         {
             return await context.Set<T>().FindAsync(id);
         }
 
-        public Task<T> UpdateAsync(T entity)
+        public async Task<T> UpdateAsync(T entity)
         {
-            throw new NotImplementedException();
+            context.Set<T>().Update(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
     }
 }
